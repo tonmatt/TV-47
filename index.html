@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BitLend - Bitcoin DeFi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0c0c0c;
+      color: #f5f5f5;
+      text-align: center;
+      padding: 40px;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    h1 {
+      color: #f9a825;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+    }
+    input {
+      background: #333;
+      color: white;
+    }
+    button {
+      background: #f9a825;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ffc107;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>BitLend</h1>
+    <p id="wallet-status">Wallet not connected</p>
+    <button onclick="connectWallet()">Connect Wallet</button>
+
+    <div id="app" style="display:none;">
+      <p>BTC Balance: <span id="btc-balance">0.00</span></p>
+      <input type="number" id="deposit-amount" placeholder="Amount to deposit (BTC)">
+      <button onclick="deposit()">Deposit</button>
+
+      <input type="number" id="borrow-amount" placeholder="Amount to borrow (BTC)">
+      <button onclick="borrow()">Borrow</button>
+
+      <input type="number" id="repay-amount" placeholder="Amount to repay (BTC)">
+      <button onclick="repay()">Repay Loan</button>
+
+      <p>Loan Balance: <span id="loan-balance">0.00</span></p>
+    </div>
+  </div>
+
+  <script>
+    let walletConnected = false;
+    let btcBalance = 0;
+    let loanBalance = 0;
+
+    function connectWallet() {
+      walletConnected = true;
+      document.getElementById("wallet-status").innerText = "Wallet connected";
+      document.getElementById("app").style.display = "block";
+    }
+
+    function deposit() {
+      if (!walletConnected) return alert("Please connect your wallet first.");
+      const amount = parseFloat(document.getElementById("deposit-amount").value);
+      if (isNaN(amount) || amount <= 0) return alert("Enter a valid amount");
+      btcBalance += amount;
+      updateDisplay();
+    }
+
+    function borrow() {
+      if (!walletConnected) return alert("Please connect your wallet first.");
+      const amount = parseFloat(document.getElementById("borrow-amount").value);
+      const maxBorrow = btcBalance * 0.6;
+      if (isNaN(amount) || amount <= 0) return alert("Enter a valid amount");
+      if (amount > maxBorrow) return alert("You can only borrow up to 60% of your BTC balance.");
+      loanBalance += amount;
+      updateDisplay();
+    }
+
+    function repay() {
+      if (!walletConnected) return alert("Please connect your wallet first.");
+      const amount = parseFloat(document.getElementById("repay-amount").value);
+      if (isNaN(amount) || amount <= 0) return alert("Enter a valid amount");
+      if (amount > loanBalance) return alert("Cannot repay more than the loan balance.");
+      loanBalance -= amount;
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      document.getElementById("btc-balance").innerText = btcBalance.toFixed(2);
+      document.getElementById("loan-balance").innerText = loanBalance.toFixed(2);
+    }
+  </script>
+</body>
+</html>
